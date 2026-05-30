@@ -21,7 +21,10 @@ const nodeBuiltins = new Set([
 // Packages that must be externalized because they break when bundled
 // (fastify ecosystem uses internal file resolution that doesn't survive bundling)
 const externalPackages = [
-  'fastify', '@fastify/cors', '@fastify/static'
+  'fastify', '@fastify/cors', '@fastify/static',
+  // Superset embed: SSH-remote is unused; externalize so its native .node binary
+  // isn't bundled (rollup can't parse it). See vendor/agent-inspector NOTES.
+  'ssh2', 'cpu-features'
 ]
 
 // Stub native .node addons (ssh2/cpu-features have JS fallbacks)

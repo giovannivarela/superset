@@ -14,7 +14,9 @@
 			"!**/*.template.ts",
 			"!**/plans",
 			"!apps/mobile/uniwind-types.d.ts",
-			"!packages/sdk/src"
+			"!packages/sdk/src",
+			// Vendored claude-devtools (MIT) — built via git subtree, kept upstream-pristine
+			"!vendor"
 		]
 	},
 	"formatter": {

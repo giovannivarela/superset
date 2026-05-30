@@ -40,6 +40,11 @@ export interface DevtoolsPaneData {
 	targetTitle: string;
 }
 
+export interface AgentInspectorPaneData {
+	/** Worktree this inspector is scoped to (reserved for future deep-linking). */
+	worktreePath?: string;
+}
+
 export type DiffFocusSide = "deletions" | "additions";
 
 export interface DiffPaneData {
@@ -69,4 +74,5 @@ export type PaneViewerData =
 	| BrowserPaneData
 	| DevtoolsPaneData
 	| DiffPaneData
-	| CommentPaneData;
+	| CommentPaneData
+	| AgentInspectorPaneData;

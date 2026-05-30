@@ -44,6 +44,7 @@ import type {
 	TerminalPaneData,
 } from "../../types";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
+import { AgentInspectorWebview } from "./components/AgentInspectorWebview";
 import { BrowserPane, BrowserPaneToolbar } from "./components/BrowserPane";
 import { ChatPane } from "./components/ChatPane";
 import { ChatPaneTitle } from "./components/ChatPane/components/ChatPaneTitle";
@@ -551,6 +552,10 @@ export function usePaneRegistry({
 						</div>
 					);
 				},
+			},
+			"agent-inspector": {
+				getTitle: () => "Agent Inspector",
+				renderPane: () => <AgentInspectorWebview />,
 			},
 		}),
 		[

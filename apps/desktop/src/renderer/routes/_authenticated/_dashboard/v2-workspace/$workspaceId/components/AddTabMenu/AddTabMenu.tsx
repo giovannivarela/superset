@@ -4,6 +4,7 @@ import {
 	DropdownMenuSeparator,
 } from "@superset/ui/dropdown-menu";
 import { BsTerminalPlus } from "react-icons/bs";
+import { LuActivity } from "react-icons/lu";
 import { TbMessageCirclePlus, TbWorld } from "react-icons/tb";
 import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
 
@@ -11,6 +12,7 @@ interface AddTabMenuProps {
 	onAddTerminal: () => void;
 	onAddChat: () => void;
 	onAddBrowser: () => void;
+	onAddInspector: () => void;
 	showPresetsBar: boolean;
 	onToggleShowPresetsBar: (enabled: boolean) => void;
 }
@@ -19,6 +21,7 @@ export function AddTabMenu({
 	onAddTerminal,
 	onAddChat,
 	onAddBrowser,
+	onAddInspector,
 	showPresetsBar,
 	onToggleShowPresetsBar,
 }: AddTabMenuProps) {
@@ -38,6 +41,10 @@ export function AddTabMenu({
 				<TbWorld className="size-4" />
 				<span>Browser</span>
 				<HotkeyMenuShortcut hotkeyId="NEW_BROWSER" />
+			</DropdownMenuItem>
+			<DropdownMenuItem className="gap-2" onClick={onAddInspector}>
+				<LuActivity className="size-4" />
+				<span>Agent Inspector</span>
 			</DropdownMenuItem>
 			<DropdownMenuSeparator />
 			<DropdownMenuCheckboxItem

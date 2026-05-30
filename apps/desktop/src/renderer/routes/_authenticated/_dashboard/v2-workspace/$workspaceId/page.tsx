@@ -183,6 +183,7 @@ function V2WorkspaceContent() {
 		addTerminalTab,
 		addChatTab,
 		addBrowserTab,
+		addInspectorTab,
 		openCommentPane,
 	} = useWorkspacePaneOpeners({
 		store,
@@ -318,6 +319,7 @@ function V2WorkspaceContent() {
 									onAddTerminal={addTerminalTab}
 									onAddChat={addChatTab}
 									onAddBrowser={addBrowserTab}
+									onAddInspector={addInspectorTab}
 									showPresetsBar={showPresetsBar}
 									onToggleShowPresetsBar={setShowPresetsBar}
 								/>
