@@ -57,18 +57,21 @@ export const App = (): React.JSX.Element => {
       if (!match) return;
       useStore.getState().selectProject(match.id);
       // selectProject loads the (recency-sorted) session list async — open the
-      // newest one as soon as it's available, then stop listening.
+      // newest one once it's available. Guard + unsubscribe BEFORE navigating:
+      // navigateToSession mutates the store, which would otherwise re-fire this
+      // subscriber and recurse (Maximum call stack size exceeded).
+      let opened = false;
       const openLatest = (): boolean => {
-        const sessions = useStore.getState().sessions;
-        const latest = sessions[0];
+        if (opened) return true;
+        const latest = useStore.getState().sessions[0];
         if (!latest) return false;
+        opened = true;
+        unsub?.();
         void useStore.getState().navigateToSession(match.id, latest.id);
         return true;
       };
       if (!openLatest()) {
-        unsub = useStore.subscribe(() => {
-          if (openLatest()) unsub?.();
-        });
+        unsub = useStore.subscribe(openLatest);
       }
     })();
     return () => {
