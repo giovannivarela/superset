@@ -97,6 +97,12 @@ async function ensureServer(): Promise<string> {
 	if (starting) return starting;
 	starting = (async () => {
 		const entry = resolveServerEntry();
+		// out/renderer ships beside dist-standalone (…/agent-inspector/out/renderer).
+		// Pin it explicitly so the server never falls back to a cwd-relative guess.
+		const rendererPath = path.join(
+			path.dirname(path.dirname(entry)),
+			"out/renderer",
+		);
 		const port = await getFreePort();
 		const child = spawn(process.execPath, [entry], {
 			env: {
@@ -104,6 +110,7 @@ async function ensureServer(): Promise<string> {
 				ELECTRON_RUN_AS_NODE: "1",
 				HOST: "127.0.0.1",
 				PORT: String(port),
+				RENDERER_PATH: rendererPath,
 			},
 			stdio: "ignore",
 		});

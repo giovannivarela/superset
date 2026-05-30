@@ -74,6 +74,20 @@ const config: Configuration = {
 			to: "resources/bin",
 			filter: ["**/*"],
 		},
+		// Vendored claude-devtools Agent Inspector server (self-contained: the
+		// server bundle + built UI; no runtime node_modules). host-service spawns
+		// resources/agent-inspector/dist-standalone/index.cjs (see process.resourcesPath
+		// in packages/host-service .../agent-inspector.ts).
+		{
+			from: "../../vendor/agent-inspector/dist-standalone",
+			to: "agent-inspector/dist-standalone",
+			filter: ["**/*"],
+		},
+		{
+			from: "../../vendor/agent-inspector/out/renderer",
+			to: "agent-inspector/out/renderer",
+			filter: ["**/*"],
+		},
 	],
 
 	files: [
