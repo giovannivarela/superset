@@ -192,6 +192,11 @@ function V2WorkspaceContent() {
 		executePreset,
 	});
 
+	// Worktree path → passed to the Agent Inspector so devtools auto-selects it.
+	const inspectorWorktreePath = workspaceTrpc.workspace.get.useQuery({
+		id: workspaceId,
+	}).data?.worktreePath;
+
 	const quickOpenOpen = useQuickOpenStore(
 		(s) => s.open && s.target?.workspaceId === workspaceId,
 	);
@@ -319,7 +324,9 @@ function V2WorkspaceContent() {
 									onAddTerminal={addTerminalTab}
 									onAddChat={addChatTab}
 									onAddBrowser={addBrowserTab}
-									onAddInspector={addInspectorTab}
+									onAddInspector={() =>
+										addInspectorTab(inspectorWorktreePath)
+									}
 									showPresetsBar={showPresetsBar}
 									onToggleShowPresetsBar={setShowPresetsBar}
 								/>

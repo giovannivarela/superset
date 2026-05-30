@@ -35,6 +35,7 @@ import {
 	useSharedFileDocument,
 } from "../../state/fileDocumentStore";
 import type {
+	AgentInspectorPaneData,
 	BrowserPaneData,
 	ChatPaneData,
 	CommentPaneData,
@@ -555,7 +556,10 @@ export function usePaneRegistry({
 			},
 			"agent-inspector": {
 				getTitle: () => "Agent Inspector",
-				renderPane: () => <AgentInspectorWebview />,
+				renderPane: (ctx: RendererContext<PaneViewerData>) => {
+					const data = ctx.pane.data as AgentInspectorPaneData;
+					return <AgentInspectorWebview worktreePath={data.worktreePath} />;
+				},
 			},
 		}),
 		[

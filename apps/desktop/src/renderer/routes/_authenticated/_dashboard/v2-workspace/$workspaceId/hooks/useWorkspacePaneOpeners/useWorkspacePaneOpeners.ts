@@ -36,7 +36,7 @@ export function useWorkspacePaneOpeners({
 	addTerminalTab: () => Promise<void>;
 	addChatTab: () => void;
 	addBrowserTab: () => void;
-	addInspectorTab: () => void;
+	addInspectorTab: (worktreePath?: string) => void;
 	openCommentPane: (comment: CommentPaneData) => void;
 } {
 	const openDiffPane = useCallback(
@@ -156,11 +156,14 @@ export function useWorkspacePaneOpeners({
 		});
 	}, [store]);
 
-	const addInspectorTab = useCallback(() => {
-		store.getState().addTab({
-			panes: [{ kind: "agent-inspector", data: {} }],
-		});
-	}, [store]);
+	const addInspectorTab = useCallback(
+		(worktreePath?: string) => {
+			store.getState().addTab({
+				panes: [{ kind: "agent-inspector", data: { worktreePath } }],
+			});
+		},
+		[store],
+	);
 
 	const openCommentPane = useCallback(
 		(comment: CommentPaneData) => {

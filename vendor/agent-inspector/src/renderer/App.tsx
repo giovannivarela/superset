@@ -41,6 +41,24 @@ export const App = (): React.JSX.Element => {
     return cleanup;
   }, []);
 
+  // Deep-link: when embedded with ?cwd=<projectPath> (Superset Agent Inspector
+  // pane), auto-select the matching project so we skip the project picker.
+  useEffect(() => {
+    const cwd = new URLSearchParams(window.location.search).get('cwd');
+    if (!cwd) return;
+    let cancelled = false;
+    void (async () => {
+      const store = useStore.getState();
+      if (store.projects.length === 0) await store.fetchProjects();
+      if (cancelled) return;
+      const match = useStore.getState().projects.find((p) => p.path === cwd);
+      if (match) useStore.getState().selectProject(match.id);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <ErrorBoundary>
       <ContextSwitchOverlay />
