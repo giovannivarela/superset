@@ -59,12 +59,13 @@ void applyShellEnvToProcess().catch((error) => {
 	console.error("[main] Failed to apply shell environment:", error);
 });
 
-// Dev mode: label the app with the workspace name so multiple worktrees are distinguishable
+// Dev mode: label the app with the workspace name so multiple worktrees are
+// distinguishable. Fall back to "dev" so the main clone gets a distinct app
+// identity (own userData/lock) and coexists with an installed Superset.app —
+// otherwise the dev instance loses the single-instance lock and exits with no window.
 if (IS_DEV) {
-	const workspaceName = resolveDevWorkspaceName();
-	if (workspaceName) {
-		app.setName(`Superset (${workspaceName})`);
-	}
+	const workspaceName = resolveDevWorkspaceName() ?? "dev";
+	app.setName(`Superset (${workspaceName})`);
 }
 
 // Dev mode: register with execPath + app script so macOS launches Electron with our entry point
@@ -323,7 +324,11 @@ protocol.registerSchemesAsPrivileged([
 	},
 ]);
 
-const gotTheLock = app.requestSingleInstanceLock();
+// In dev, skip the single-instance lock: electron-vite relaunches on every
+// rebuild, and the lock would make each fresh instance exit while a stale one
+// keeps serving an outdated bundle. Dev runs under a distinct "Superset (dev)"
+// userData, so coexistence with an installed build is unaffected.
+const gotTheLock = IS_DEV ? true : app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
 	app.exit(0);
