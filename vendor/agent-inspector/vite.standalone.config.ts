@@ -21,11 +21,36 @@ const nodeBuiltins = new Set([
 // Packages that must be externalized because they break when bundled
 // (fastify ecosystem uses internal file resolution that doesn't survive bundling)
 const externalPackages = [
-  'fastify', '@fastify/cors', '@fastify/static',
-  // Superset embed: SSH-remote is unused; externalize so its native .node binary
-  // isn't bundled (rollup can't parse it). See vendor/agent-inspector NOTES.
-  'ssh2', 'cpu-features'
 ]
+
+// Superset embed: SSH-remote is unused, so stub ssh2/cpu-features to empty
+// modules. Lets the whole server bundle self-contained (no runtime node_modules)
+// and avoids bundling ssh2's native .node binary (rollup can't parse it).
+const stubbedPackages = new Set(['ssh2', 'cpu-features'])
+
+function packageStub(): Plugin {
+  const STUB_ID = '\0pkg-stub'
+  return {
+    name: 'package-stub',
+    enforce: 'pre',
+    resolveId(source) {
+      if (stubbedPackages.has(source) || source.startsWith('ssh2/')) return STUB_ID
+      return null
+    },
+    load(id) {
+      if (id === STUB_ID) {
+        // Proxy stub covering both default and the named exports the codebase
+        // uses (ssh2's `Client`). SSH paths are never hit in the embed.
+        return [
+          'const proxy = new Proxy(function(){}, { get: () => proxy, apply: () => proxy, construct: () => proxy });',
+          'export const Client = proxy;',
+          'export default proxy;',
+        ].join('\n')
+      }
+      return null
+    },
+  }
+}
 
 // Stub native .node addons (ssh2/cpu-features have JS fallbacks)
 function nativeModuleStub(): Plugin {
@@ -78,7 +103,7 @@ export default proxyObj;
 }
 
 export default defineConfig({
-  plugins: [nativeModuleStub(), electronStub()],
+  plugins: [nativeModuleStub(), electronStub(), packageStub()],
   resolve: {
     alias: {
       '@main': resolve(__dirname, 'src/main'),
