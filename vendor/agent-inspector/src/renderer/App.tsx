@@ -42,20 +42,38 @@ export const App = (): React.JSX.Element => {
   }, []);
 
   // Deep-link: when embedded with ?cwd=<projectPath> (Superset Agent Inspector
-  // pane), auto-select the matching project so we skip the project picker.
+  // pane), auto-select the matching project AND open its most-recent session so
+  // we land directly in the conversation instead of the project picker.
   useEffect(() => {
     const cwd = new URLSearchParams(window.location.search).get('cwd');
     if (!cwd) return;
     let cancelled = false;
+    let unsub: (() => void) | undefined;
     void (async () => {
       const store = useStore.getState();
       if (store.projects.length === 0) await store.fetchProjects();
       if (cancelled) return;
       const match = useStore.getState().projects.find((p) => p.path === cwd);
-      if (match) useStore.getState().selectProject(match.id);
+      if (!match) return;
+      useStore.getState().selectProject(match.id);
+      // selectProject loads the (recency-sorted) session list async — open the
+      // newest one as soon as it's available, then stop listening.
+      const openLatest = (): boolean => {
+        const sessions = useStore.getState().sessions;
+        const latest = sessions[0];
+        if (!latest) return false;
+        void useStore.getState().navigateToSession(match.id, latest.id);
+        return true;
+      };
+      if (!openLatest()) {
+        unsub = useStore.subscribe(() => {
+          if (openLatest()) unsub?.();
+        });
+      }
     })();
     return () => {
       cancelled = true;
+      unsub?.();
     };
   }, []);
 
